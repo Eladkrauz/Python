@@ -1,0 +1,268 @@
+import math
+
+def getRelation():
+#The function gets from the user the a, b k and i parts of the recurrence relation.
+#The function takes out a list that contains: a on its first element, b on its second element.
+#f(n) is in format >> n^k ∙ (log(n))^i, so k on its third element and i on its fourth element.
+#The fifth element is the full recurrence relation (for printing porpuses mainly).
+    relation = [0,0,0,0,0]
+    print("This program gets variables of the T(n) relation and determines the asymptotic running time of the algorithm.")
+    print("Your recurrence relation needs to be from the following form:\nT(n) = a∙T(n/b) + Θ(n^k∙(log n)^i).")
+    print("Notes:\na must be an integer and >= 1\nb must be an integer and > 1\nk and i must be floats and >= 0")
+    print("Please enter:")
+    while True:
+    #keeps getting input until all four inputs are valid according to instructions.
+        try:
+            relation[0] = float(input("a: "))
+            relation[1] = float(input("b: "))
+            relation[2] = float(input("k: "))
+            relation[3] = float(input("i: "))
+            #checking if one of the inputs is invalid
+            if relation[0] < 1 or relation[1] <= 1 or relation[2] < 0 or relation[3] < 0:
+                print("You've entered invalid inputs. Please make sure: a>=1, b>1, k>=0, i>=0.")
+                print("Try again:\n")
+                continue
+            break
+        except: #in case the input is not valid.
+            print("You've entered invalid inputs. Please make sure: a>=1, b>1, k>=0, i>=0.")
+            print("Try again:\n")
+    
+    #changing floats to ints if possible.
+    if relation[0].is_integer():
+        relation[0] = int(relation[0])
+    if relation[1].is_integer():
+        relation[1] = int(relation[1])
+    if relation[2].is_integer():
+        relation[2] = int(relation[2])
+    if relation[3].is_integer():
+        relation[3] = int(relation[3])
+    
+    #forming the recurrence relation:
+    relation[4] = "T(n) = " + str(relation[0]) + "∙T(n/" + str(relation[1]) + ") + " + "Θ("
+    if relation[2] != 0:
+        if relation[2] != 1:
+            relation[4] += "n^" + str(relation[2])
+        else:
+            relation[4] += "n"
+    if relation[2] != 0 and relation[3] != 0:
+        relation[4] += "∙"
+        
+    if relation[3] != 0:
+        if relation[3] != 1:
+            relation[4] += "(log n)^" + str(relation[3])
+        else:
+            relation[4] += "log n"
+            
+    if relation[2] == 0 and relation[3] == 0:
+        relation[4] += "1"
+    relation[4] += ")"
+    
+    return relation #now the list is: [a element, b element, k element, i element, the full recurrence relation]
+    
+def firstCase(relation):
+#The function gets a list which represents a recurrence relation and tries to solve it using
+#the first case of the master theorem.
+#There are three options:
+#1: f(n) is a polynomial function
+#2: f(n) is a logarithmic function
+#3: f(n) is a combination of polynomial and logarithmic function
+    log_b_a = math.log(relation[0]) / math.log(relation[1])
+    print(".\n.\n.\nTrying to solve with the first case")
+    if relation[2] != 0 and relation[3] == 0: #option 1: polynomial function
+    #two options:
+    #1: if log b (a) <= power exponent of n, solving with the first case is not possible.
+    #2: if log b (a) > power exponent of n, it is possible.
+        if log_b_a <= relation[2]: #option 1
+            solution = False
+        else: #option 2
+            epsilon = log_b_a - relation[2]
+            #making sure ε>0
+            if epsilon <= 0:
+                solution = False
+            else:
+                solution = True
+
+    elif relation[2] == 0 and relation[3] != 0: #option 2: logarithmic function
+        #two options:
+        #1: if log b (a) = 0, solving with the first case is not possible.
+        #2: if log b (a) > 0, it is possible.
+        if log_b_a == 0: #option 1
+            solution = False
+        else: #option 2
+            epsilon = log_b_a / 2
+            #making sure ε>0
+            if epsilon <= 0:
+                solution = False
+            else:
+                solution = True
+    
+    else: #option 3: combination of polynomial and logarithmic function
+        #two options:
+        #1: if log b (a) <= k where k is from n^k, solving with the first case is not possible.
+        #2: if log b (a) > k, it is possible (because of the law: log^k(n) = o(n^ε) for all ε,k > 0)
+        if log_b_a <= relation[2]: #option 1
+            solution = False
+        else: #option 2
+            epsilon = (log_b_a - relation[2]) / 2
+            if epsilon <= 0:
+                solution = False
+            else:
+                solution = True
+                
+    #desining the log_b_a to the minimum digits after the '.'
+    if log_b_a.is_integer():
+        log_b_a = int(log_b_a)
+    else:
+        log_b_a = "{:.2f}".format(log_b_a)
+        
+    if solution:
+        print("It is possible to solve the relation with the first case.")
+        print("It can be solved with ε =",epsilon)
+        return "Θ(n^" + str(log_b_a) + ")"
+    else:
+        print("It is impossible to solve with the first case,")
+        print("since there is no ε>0 so the equation: f(n) = O(n^(log ",relation[1],"(",relation[0],")-ε)) is True.",sep='')
+        return False
+            
+def secondCase(relation):
+#The function gets a list which represents a recurrence relation and tries to solve it using
+#the second case of the master theorem.
+#There are three options:
+#1: f(n) is a polynomial function
+#2: f(n) is a logarithmic function
+#3: f(n) is a combination of polynomial and logarithmic function
+    log_b_a = math.log(relation[0]) / math.log(relation[1])
+    print(".\n.\n.\nTrying to solve with the second case")
+    if relation[2] != 0 and relation[3] == 0: #option 1: polynomial function
+    #two options:
+    #1: if log b (a) != power exponent of n, solving with the second case is not possible.
+    #2: if log b (a) = power exponent of n, it is possible.
+        if log_b_a != relation[2]: #option 1
+            solution = False
+        else: #option 2
+            solution = True
+
+    else: #option 2 or option 3 >>> can't be solved with the second case.
+        solution = False
+                
+    #desining the log_b_a to the minimum digits after the '.'
+    if log_b_a.is_integer():
+        log_b_a = int(log_b_a)
+    else:
+        log_b_a = "{:.2f}".format(log_b_a)
+    
+    if solution:
+        print("It is possible to solve the relation with the second case.")
+        solution = "Θ(n"
+        if float(log_b_a) != 1:
+            solution += "^"+str(log_b_a)
+        solution += "∙log n)"
+        return solution
+    else:
+        print("It is impossible to solve with the second case.")
+        return False    
+    
+def thirdCase(relation):
+#The function gets a list which represents a recurrence relation and tries to solve it using
+#the third case of the master theorem.
+#There are three options:
+#1: f(n) is a polynomial function
+#2: f(n) is a logarithmic function
+#3: f(n) is a combination of polynomial and logarithmic function
+    log_b_a = math.log(relation[0]) / math.log(relation[1])
+    print(".\n.\n.\nTrying to solve with the third case")
+    #first condition of the third case
+    if relation[2] != 0 and relation[3] == 0: #option 1: polynomial function
+    #two options:
+    #1: if log b (a) >= power exponent of n, solving with the third case is not possible.
+    #2: if log b (a) < power exponent of n, it is possible.
+        if log_b_a >= relation[2]: #option 1
+            solution = False
+        else: #option 2
+            epsilon = relation[2] - log_b_a
+            #making sure ε>0
+            if epsilon <= 0:
+                solution = False
+            else:
+                solution = True
+
+    elif relation[2] == 0 and relation[3] != 0: #option 2: logarithmic function
+        #there is no option to solve with the third case.
+        #this is because of the law: log^k(n) = o(n^ε) for all ε,k > 0
+        solution = False
+    
+    else: #option 3: combination of polynomial and logarithmic function
+        #two options:
+        #1: if log b (a) >= k where k is from n^k, solving with the third case is not possible.
+        #2: if log b (a) < k, it is possible (because of the law: log^k(n) = o(n^ε) for all ε,k > 0)
+        if log_b_a >= relation[2]: #option 1
+            solution = False
+        else: #option 2
+            epsilon = relation[2] - log_b_a
+            if epsilon <= 0:
+                solution = False
+            else:
+                solution = True
+    
+    #second condition of the third case - regularity:
+    if solution:
+        c = relation[0]/(relation[1]**relation[2])
+        if c > 1: #checking if c = a/b is > 1
+            solution = False
+            
+    #desining the log_b_a to the minimum digits after the '.'
+    if log_b_a.is_integer():
+        log_b_a = int(log_b_a)
+    else:
+        log_b_a = "{:.2f}".format(log_b_a)
+     
+    if solution:
+        print("It is possible to solve the relation with the third case.")
+        print("It can be solved with ε =",epsilon,"and c =",c)
+        solution = (relation[4])[relation[4].index('Θ'):]
+        return solution
+    else:
+        print("It is impossible to solve with the third case,")
+        print("since there are no ε>0 and c<1 that fit on this relation")
+        return False
+    
+def startAgain():
+#a function for letting the user to start again the program.
+    choice = input("Start again? (y/n): ")
+    choice = choice.lower()
+    if choice == 'y':
+        main()
+    elif choice == 'n':
+        return
+    else:
+        print("Type y or n only please.")
+        startAgain()
+
+def main():
+    relation = getRelation()
+    flag = 0
+    #start solving:
+    print("Solving the recurrence relation:", relation[4])
+    solution = firstCase(relation)
+    if solution != False:
+        flag = 1 #solved by case number 1
+        
+    #will try second and third cases only if the first case didn't work.
+    if flag == 0:
+        solution = secondCase(relation)
+        if solution != False:
+            flag = 2 #solved by case number 2
+    
+    #will try third case only if the first and the second cases didn't work.
+    if flag == 0:
+        solution = thirdCase(relation)
+        if solution != False:
+            flag = 3 #solved by case number 3
+            
+    if flag == 0:
+        print("\nThe relation: ", relation[4], "can't be solved using the Master Theorem.")
+    else:
+        print("The asymptotic running time of the algorithm represented by the relation", relation[4], "is:", solution)
+    startAgain()
+
+main()
