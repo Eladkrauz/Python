@@ -1,0 +1,168 @@
+import math
+
+def getSystem():
+#This function sets the linear congruence relations system to be solved with the chinese remainder theorem.
+#It gets pairs of numbers - r & m, so each pair configures a relation of the form: x ≡ r mod m
+    print("Please enter linear congruence relations according to the following instructions:")
+    print("Each relation must use the form: x ≡ r mod m, while r be an integer and m must be a natural number.")
+    print("You will need to enter pairs of numbers (r's and m's).")
+    print("To finish, type 0 0, otherwise the system will keep adding new relations.")
+    print("Please make sure that you enter at least 2 relations.")
+    relations = [] #the linear congruence relations system
+    relationsCounter = 0 #counting how many valid relations have been entered.
+    rInput = 1 #default for entering the outer while
+    mInput = 1 #default for entering the outer while
+    while rInput != 0 and mInput != 0:
+    #keeps getting input until both r and m inputs are 0.
+        while True:
+        #keeps getting input until the input is valid (according to instructions)
+            try:
+                rInput = int(input("r: "))
+                mInput = int(input("m: "))
+                #checking if one of the inputs is invalid
+                if rInput == 0 and mInput == 0: #check if finishing is possible >> only if at least 2 relations were entered
+                    if relationsCounter >= 2: #finish
+                        break
+                    else: #if not, must keep entering.
+                        print("Please make sure that you enter at least 2 relations.")
+                        print("Try again.\n")
+                        continue
+                elif mInput < 1: #m must be a natural number
+                    print("m must be a natural number.")
+                    print("Try again.\n")
+                    continue
+                else: #if it is a natural number >> adding the relation to the system.
+                    break
+            except: #in case the input is not an integer.
+                print("You've entered invalid inputs. Please make sure: r is an integer, m is a natural number.")
+                print("Try again:\n")
+                
+        #checking if the user asked to finish
+        if rInput != 0 and mInput != 0: #if not: adding the new relation to the system
+            relations.append([0,0])
+            relations[relationsCounter][0] = rInput
+            relations[relationsCounter][1] = mInput
+            relationsCounter += 1
+            print(f"The relation x≡{rInput}mod{mInput} successfully added.")
+    return relations
+            
+def checkCoprime(relations):
+#This function checks if all the modules are coprime integers.
+#Returns True/False accordingly. 
+    for i in range(len(relations) - 1):
+        for j in range(i+1, len(relations)):
+            if math.gcd(relations[i][1], relations[j][1]) != 1: #are not coprime.
+                return False
+    return True
+
+def extendedEuclideanAlgorithm(a, m):
+#Computes the Bezout coefficients s and t such that a*s + b*t = gcd(a, b).
+#Returns (s,t)
+    s_prev, s = 1, 0
+    t_prev, t = 0, 1
+    r_prev, r = a, m
+
+    while r != 0:
+        quotient = r_prev // r
+        r_prev, r = r, r_prev - quotient * r
+        s_prev, s = s, s_prev - quotient * s
+        t_prev, t = t, t_prev - quotient * t
+
+    return r_prev, s_prev, t_prev
+
+def solveLinearCongruence(a, r, m):
+#Solves the linear congruence equation ax ≡ r mod m, where a, r, and m are integers.
+#Returns the smallest positive integer solution x to the equation.
+    #use the extended Euclidean algorithm to find the Bezout coefficients s and t
+    gcd, s, t = extendedEuclideanAlgorithm(a, m)
+    #if gcd(a, m) does not divide r, then there is no solution
+    if r % gcd != 0:
+        return None
+    #calculate the modular inverse of a modulo m using the Bezout coefficients
+    a_inv = (s * (r // gcd)) % m
+    #calculate the solution x as (r * a_inv) modulo m
+    x = (r * a_inv) % m
+    #ensure that the solution is the smallest positive integer
+    while x < 0:
+        x += m
+    while x - m >= 0:
+        x -= m
+    return x
+            
+def solve(relations):
+#This function gets a relations system and solves it using the chinese remainder theorem.
+    #finding M, M1, M2, ..., Mi
+    size = len(relations)
+    print(".\n.\n.\nSolving the relations system:")
+    for i in range(size):
+        print(f"x≡{relations[i][0]}mod{relations[i][1]}")
+    M_list = [0] * size
+    M = 1
+    #calculating M: M = m1*m2*m3*...*mi (where m is in each relation)
+    print(".\n.\n.\nCalculating M: M =",relations[0][1], end=' ')
+    M *= relations[0][1]
+    for i in range(1, size):
+        M *= relations[i][1]
+        print("∙",relations[i][1],end=' ')
+    print("=",M)
+    #calculating M1, M2, ... Mi: Mi = M/mi
+    print("\nCalculating Mi:")
+    for i in range(size):
+        M_list[i] = M/relations[i][1]
+        M_list[i] = int(M_list[i]) #changing to integer.
+        print(f"M{i+1} = M/m{i+1} = {M}/{relations[i][1]} = {M_list[i]}")
+    
+    #finding S1, S2, ..., Si
+    S_list = [0] * size
+    print("\nCalculating Si:")
+    #The linear congruence relation to solve is: Mi*Si ≡ 1 mod mi >> Si needs to be found.
+    for i in range(size):
+        S_list[i] = solveLinearCongruence(M_list[i], relations[i][0], relations[i][1])
+        print(f"The solution of the linear congruence: {M_list[i]}∙S{i+1}≡1mod{relations[i][1]} is: S{i+1}={S_list[i]}mod{relations[i][1]}")
+        
+    #finding x0: x0 ≡ (M1*S1*r1 + M2*S2*r2 + ... + Mi*Si*ri) mod M
+    x0 = 0
+    print("\nCalculating x0: (x0≡(M1∙S1∙r1 + M2∙S2∙r2 + ∙∙∙ + Mi∙Si∙ri)modM\nx0 ≡ (",end=' ',sep=' ')
+    for i in range(size):
+        x0 += (M_list[i] * S_list[i] * relations[i][0])
+        print(f"{M_list[i]}∙{S_list[i]}∙{relations[i][0]}",end=' ')
+        if i < size - 1:
+            print("+",end=' ')
+    print(") mod",M,sep=' ')
+    
+    #printing the solution:
+    print(f"=> x0≡{x0}mod{M}")
+    
+    if x0 > 0:
+        while x0 - M > 0:
+            x0 = x0 - M
+    if x0 < 0:
+        while x0 - M < 0:
+            x0 = x0 + M
+    print(f"\nWe want the result to be in the range: (0,{M-1}), so:")    
+    print(f"=> x0≡{x0}mod{M}. The solution can also be represented this way: x0={M}k+{x0}, k∈Z")
+        
+    
+def startAgain():
+#a function for letting the user to start again the program.
+    choice = input("\nStart again? (y/n): ")
+    choice = choice.lower()
+    if choice == 'y':
+        main()
+    elif choice == 'n':
+        return
+    else:
+        print("Type y or n only please.")
+        startAgain()
+
+def main():
+    relations = getSystem()
+    if checkCoprime(relations):
+        solve(relations)
+    else:
+        print("The provided system can't be solved using the Chinese Remainder Theorem")
+        print("since the modules are not coprime integers.")
+    startAgain()
+    print("Exit")    
+     
+main()
