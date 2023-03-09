@@ -227,7 +227,7 @@ def thirdCase(relation):
         return False
     
 def startAgain():
-#a function for letting the user to start again the program.
+#This function gives the user the option to start again.
     choice = input("Start again? (y/n): ")
     choice = choice.lower()
     if choice == 'y':
