@@ -8,7 +8,7 @@ def getRelation():
     relation = [0,0,0,0,0]
     print("This program gets variables of the T(n) relation and determines the asymptotic running time of the algorithm.")
     print("Your recurrence relation needs to be from the following form:\nT(n) = a∙T(n/b) + Θ(n^k∙(log n)^i).")
-    print("Notes:\na must be an integer and >= 1\nb must be an integer and > 1\nk and i must be floats and >= 0")
+    print("Notes:\na >= 1\nb > 1\nk >= 0\ni >= 0")
     print("Please enter:")
     while True:
     #keeps getting input until all four inputs are valid according to instructions.
@@ -227,8 +227,8 @@ def thirdCase(relation):
         return False
     
 def startAgain():
-#This function gives the user the option to start again.
-    choice = input("Start again? (y/n): ")
+#a function for letting the user to start again the program.
+    choice = input("\nStart again? (y/n): ")
     choice = choice.lower()
     if choice == 'y':
         main()
@@ -264,5 +264,6 @@ def main():
     else:
         print("The asymptotic running time of the algorithm represented by the relation", relation[4], "is:", solution)
     startAgain()
+    print("Exit")
 
 main()
