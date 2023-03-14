@@ -58,17 +58,14 @@ def checkCoprime(relations):
 def extendedEuclideanAlgorithm(a, m):
 #Computes the Bezout coefficients s and t such that a*s + b*t = gcd(a, b).
 #Returns (s,t)
-    s_prev, s = 1, 0
-    t_prev, t = 0, 1
-    r_prev, r = a, m
-
-    while r != 0:
-        quotient = r_prev // r
-        r_prev, r = r, r_prev - quotient * r
-        s_prev, s = s, s_prev - quotient * s
-        t_prev, t = t, t_prev - quotient * t
-
-    return r_prev, s_prev, t_prev
+    if a == 0:
+        return m, 0, 1
+    gcd, s1, t1 = extendedEuclideanAlgorithm(m % a, a)
+    
+    #update x and y using results of recursive call
+    s = t1 - (m // a) * s1
+    t = s1
+    return gcd, s, t
 
 def solveLinearCongruence(a, r, m):
 #Solves the linear congruence equation ax ≡ r mod m, where a, r, and m are integers.
@@ -117,7 +114,7 @@ def solve(relations):
     print("\nCalculating Si:")
     #The linear congruence relation to solve is: Mi*Si ≡ 1 mod mi >> Si needs to be found.
     for i in range(size):
-        S_list[i] = solveLinearCongruence(M_list[i], relations[i][0], relations[i][1])
+        S_list[i] = solveLinearCongruence(M_list[i], 1, relations[i][1])
         print(f"The solution of the linear congruence: {M_list[i]}∙S{i+1}≡1mod{relations[i][1]} is: S{i+1}={S_list[i]}mod{relations[i][1]}")
         
     #finding x0: x0 ≡ (M1*S1*r1 + M2*S2*r2 + ... + Mi*Si*ri) mod M
