@@ -1,31 +1,35 @@
 import math
+import time
 
+def typeOn(str):
+#prints on the screen with a delay for the feeling of a typing animation
+    for char in str:
+        print(char, end="", flush=True)
+        time.sleep(0.01) #the waiting time between each char
+    
 def getRelation():
 #The function gets from the user the a, b k and i parts of the recurrence relation.
 #The function takes out a list that contains: a on its first element, b on its second element.
 #f(n) is in format >> n^k ∙ (log(n))^i, so k on its third element and i on its fourth element.
 #The fifth element is the full recurrence relation (for printing porpuses mainly).
     relation = [0,0,0,0,0]
-    print("This program gets variables of the T(n) relation and determines the asymptotic running time of the algorithm.")
-    print("Your recurrence relation needs to be from the following form:\nT(n) = a∙T(n/b) + Θ(n^k∙(log n)^i).")
-    print("Notes:\na >= 1\nb > 1\nk >= 0\ni >= 0")
-    print("Please enter:")
+    typeOn("This program gets variables of the T(n) relation and determines the asymptotic running time of the algorithm.\nYour recurrence relation needs to be from the following form:\nT(n) = a∙T(n/b) + Θ(n^k∙(log n)^i).\nNotes:\na >= 1\nb > 1\nk >= 0\ni >= 0\nPlease enter:\n")
     while True:
     #keeps getting input until all four inputs are valid according to instructions.
         try:
+            time.sleep(0.5)
             relation[0] = float(input("a: "))
             relation[1] = float(input("b: "))
             relation[2] = float(input("k: "))
             relation[3] = float(input("i: "))
             #checking if one of the inputs is invalid
             if relation[0] < 1 or relation[1] <= 1 or relation[2] < 0 or relation[3] < 0:
-                print("You've entered invalid inputs. Please make sure: a>=1, b>1, k>=0, i>=0.")
-                print("Try again:\n")
+                typeOn("\nYou've entered invalid inputs. Please make sure: a>=1, b>1, k>=0, i>=0.\nTry again:\n")
                 continue
             break
         except: #in case the input is not valid.
-            print("You've entered invalid inputs. Please make sure: a>=1, b>1, k>=0, i>=0.")
-            print("Try again:\n")
+            typeOn("\nYou've entered invalid inputs. Please make sure: a>=1, b>1, k>=0, i>=0.\nTry again:\n")
+
     
     #changing floats to ints if possible.
     if relation[0].is_integer():
@@ -67,7 +71,8 @@ def firstCase(relation):
 #2: f(n) is a logarithmic function
 #3: f(n) is a combination of polynomial and logarithmic function
     log_b_a = math.log(relation[0]) / math.log(relation[1])
-    print(".\n.\n.\nTrying to solve with the first case")
+    typeOn("\n.\n.\n.\nTrying to solve with the first case")
+    time.sleep(0.5)
     if relation[2] != 0 and relation[3] == 0: #option 1: polynomial function
     #two options:
     #1: if log b (a) <= power exponent of n, solving with the first case is not possible.
@@ -116,12 +121,17 @@ def firstCase(relation):
         log_b_a = "{:.2f}".format(log_b_a)
         
     if solution:
-        print("It is possible to solve the relation with the first case.")
-        print("It can be solved with ε =",epsilon)
+        typeOn("\nIt is possible to solve the relation with the first case.")
+        typeOn("\nIt can be solved with ε = " + str(epsilon))
+        solution = "Θ(n"
+        if float(log_b_a) != 1:
+            solution += "^"+str(log_b_a)
+        solution += ")"
+        return solution
         return "Θ(n^" + str(log_b_a) + ")"
     else:
-        print("It is impossible to solve with the first case,")
-        print("since there is no ε>0 so the equation: f(n) = O(n^(log ",relation[1],"(",relation[0],")-ε)) is True.",sep='')
+        typeOn("\nIt is impossible to solve with the first case,")
+        typeOn("\nsince there is no ε>0 so the equation: f(n) = O(n^(log " + str(relation[1]) + "(" + str(relation[0]) + ")-ε)) is True.")
         return False
             
 def secondCase(relation):
@@ -132,7 +142,8 @@ def secondCase(relation):
 #2: f(n) is a logarithmic function
 #3: f(n) is a combination of polynomial and logarithmic function
     log_b_a = math.log(relation[0]) / math.log(relation[1])
-    print(".\n.\n.\nTrying to solve with the second case")
+    typeOn("\n.\n.\n.\nTrying to solve with the second case")
+    time.sleep(0.5)
     if relation[2] != 0 and relation[3] == 0: #option 1: polynomial function
     #two options:
     #1: if log b (a) != power exponent of n, solving with the second case is not possible.
@@ -152,14 +163,14 @@ def secondCase(relation):
         log_b_a = "{:.2f}".format(log_b_a)
     
     if solution:
-        print("It is possible to solve the relation with the second case.")
+        typeOn("\nIt is possible to solve the relation with the second case.")
         solution = "Θ(n"
         if float(log_b_a) != 1:
             solution += "^"+str(log_b_a)
         solution += "∙log n)"
         return solution
     else:
-        print("It is impossible to solve with the second case.")
+        typeOn("\nIt is impossible to solve with the second case.")
         return False    
     
 def thirdCase(relation):
@@ -170,7 +181,8 @@ def thirdCase(relation):
 #2: f(n) is a logarithmic function
 #3: f(n) is a combination of polynomial and logarithmic function
     log_b_a = math.log(relation[0]) / math.log(relation[1])
-    print(".\n.\n.\nTrying to solve with the third case")
+    typeOn("\n.\n.\n.\nTrying to solve with the third case")
+    time.sleep(0.5)
     #first condition of the third case
     if relation[2] != 0 and relation[3] == 0: #option 1: polynomial function
     #two options:
@@ -217,32 +229,33 @@ def thirdCase(relation):
         log_b_a = "{:.2f}".format(log_b_a)
      
     if solution:
-        print("It is possible to solve the relation with the third case.")
-        print("It can be solved with ε =",epsilon,"and c =",c)
+        typeOn("\nIt is possible to solve the relation with the third case.")
+        typeOn("\nIt can be solved with ε = " + str(epsilon) + " and c = " + str(c))
         solution = (relation[4])[relation[4].index('Θ'):]
         return solution
     else:
-        print("It is impossible to solve with the third case,")
-        print("since there are no ε>0 and c<1 that fit on this relation")
+        typeOn("\nIt is impossible to solve with the third case,")
+        typeOn("\nsince there are no ε>0 and c<1 that fit on this relation")
         return False
     
 def startAgain():
 #a function for letting the user to start again the program.
-    choice = input("\nStart again? (y/n): ")
+    choice = input("\n\nStart again? (y/n): ")
     choice = choice.lower()
     if choice == 'y':
         main()
     elif choice == 'n':
         return
     else:
-        print("Type y or n only please.")
+        typeOn("\nType y or n only please.")
         startAgain()
 
 def main():
     relation = getRelation()
     flag = 0
     #start solving:
-    print("Solving the recurrence relation:", relation[4])
+    time.sleep(0.5)
+    typeOn("\nSolving the recurrence relation: " + relation[4])
     solution = firstCase(relation)
     if solution != False:
         flag = 1 #solved by case number 1
@@ -258,12 +271,12 @@ def main():
         solution = thirdCase(relation)
         if solution != False:
             flag = 3 #solved by case number 3
-            
+    
+    time.sleep(0.5)    
     if flag == 0:
-        print("\nThe relation: ", relation[4], "can't be solved using the Master Theorem.")
+        typeOn("\n\nThe relation: " + relation[4] + " can't be solved using the Master Theorem.")
     else:
-        print("The asymptotic running time of the algorithm represented by the relation", relation[4], "is:", solution)
+        typeOn("\n\nThe asymptotic running time of the algorithm represented by the relation " + relation[4] + " is: " + solution)
     startAgain()
-    print("Exit")
 
 main()
